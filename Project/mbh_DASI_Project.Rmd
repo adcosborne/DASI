@@ -1,0 +1,36 @@
+---
+title: "mbh_DASI_Project"
+author: "mbh038"
+date: "October 4, 2015"
+output: html_document
+---
+
+```{r}
+load(url("http://bit.ly/dasi_anes_data"))
+```
+
+```{r}
+df<-as.data.frame(cbind(as.numeric(anes$incgroup_prepost),anes$health_insured))
+names(df)=c("income_cat","health_insured")
+# remove NAs
+df<-subset(df,is.na(df$income_cat)==FALSE & is.na(df$health_insured)==FALSE)
+# remove those with incomes over $250000
+df<-subset(df,df$income !=28)
+```
+```{r}
+income=c(2500,7500,11250,13750,16250,18750,21250,23750,26250,28750,32500,37500,
+          42500,47500,52500,57500,62500,67500,72500,77500,85000,95000,105000,
+          117500,137500,162500,212500)
+
+for (i in 1:nrow(df)) {
+    df$income=income[df$income_cat]
+}
+```
+```{r}
+boxplot(income~health_insured,data=df)
+insured<-subset(df,health_insured==1)
+notInsured<-subset(df,health_insured==2)
+
+ci95<-mean(insured$income)+c(-1,1)*qnorm(0.975)*sd(insured$income)/sqrt(nrow(insured))
+ci95
+```
