@@ -1,3 +1,7 @@
+## DASI (Courseracourse, Duke University, Mine Citenkaya-Rundel)
+
+## Autumn 2015
+
 ## Lab 3a
 
 load(url("http://www.openintro.org/stat/data/ames.RData"))
