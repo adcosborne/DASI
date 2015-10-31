@@ -6,8 +6,8 @@ output:
     theme: cerulean
 ---
 
-```{r}
-options("scipen"=10)
+```{r echo=FALSE}
+options("scipen"=100)
 ```
 <!-- For more info on RMarkdown see http://rmarkdown.rstudio.com/ -->
 
@@ -65,39 +65,33 @@ for (i in 1:nrow(df)) {
     df$income=income[df$income_cat]
 }
 ```
-
-
 Hence this variable will be treated in the analysis of the first question as numeric in nature.
 
 The second variable is categorical in type, with categories "Yes" (I do have health insurance) and "No" ( I do not).
 
 To help answer the second of our questions, we find the proportion and number in each category that do not have health insurance in each of the 28 income categories.
-
 ```{r proportions}
 s<-round(tapply(df$health_insured-1,df$income_cat,mean),3)
 s
 sc<-sapply(split(df,df$income_cat),nrow)
 sc
 ```
-
 To account for inflation between elections, the household incomes could be normalised for each election by dividing by the mean and standard deviation of household incomes for whichever election the data were collected at. However we will not do this in this short study.
 
 ### Exploratory data analysis:
-
-```{r EDA}
+```{r EDA, echo=FALSE}
 summary(subset(df,health_insured==1))
 summary(subset(df,health_insured==2))
 insured<-subset(df,health_insured==1)
 notInsured<-subset(df,health_insured==2)
 ```
-
 ```{r}
 par(mfrow=c(1,2))
 boxplot(income~health_insured,
         data=df,
         names=c("Yes","No"),
         xlab="Health insurance?",
-        ylab="Household income",
+        ylab="Household annual income ($)",
         col=terrain.colors(3))
 # legend("topright", inset=.02, title="health Insurance",
   	#c("Yes","No"), fill=terrain.colors(3), horiz=TRUE,cex=0.7)
@@ -109,28 +103,25 @@ plot(s,
      ylab="Proportion without cover")
 
 ```
-
 Figure 1: (left) Distribution of household income as a function of whether or not all indiviudals in the household have health insurance. (right) variation with income bracket of proportion of households without health insurance.
 
-The boxplots in Figure 1 suggest data that is right skewed, as is common for incomes, and that the median income, at least, for households with health insurance (labelled Box 1) is higher than that for households without it (labelled 2). The mean income for households where individuals have health insurance is `r round(mean(subset(df$income,df$health_insured==1)),0)` while that for incomes where this is not the case is `r round(mean(subset(df$income,df$health_insured==2)),0)` - just under half as big.
+The boxplots in Figure 1 suggest data that is right skewed, as is common for incomes, and that the median income, at least, for households with health insurance is higher than that for households without it. The mean income for households where individuals have health insurance is $`r round(mean(subset(df$income,df$health_insured==1)),0)` while that for incomes where this is not the case is $`r round(mean(subset(df$income,df$health_insured==2)),0)` - just under half as big.
 
 A plot of the proportion of households in which people live that do not have health insurance against income category (1 is lowest income, 27 is highest income) is shown in Figure 1 (b):
 
 There is a clear downward trend here, but the apparent linearity of the trend is deceptive since income category is a categorical variable, with the highest categories having higher absolute  width in monetary value than the lower ones. Nevertheless, we see that about one third of low income households sampled had people without health cover, whereas this was the case in less than 5% of the high income households.
 
 ### Inference:
+In this section, regarding our first question,  we will establish the 99% condidence interval around one of the mean incomes, and see if it brackets the other mean income, and also evaluate how likely it is that one mean could be as far, or further, from the other as we find it to be if in fact level of health insurance ws not correlated with mean household income
 
 When we calculate the 99% confidence interval around the mean income of households that do have health insurance, we find:
 ```{r}
 ci99<-mean(insured$income)+c(-1,1)*qnorm(0.995)*sd(insured$income)/sqrt(nrow(insured))
 ci99
 ```
-The mean income of households where individuals live that do not have health insurance is `r round(mean(subset(df$income,df$health_insured==2)),0)` This is far below the 99% confidence interval of the mean income of the households where individuals do have cover. We can therefore infer, with at least 99% confidence, that the mean income of such households _IS_ lower.
+The mean annual income of households where individuals live that do not have health insurance is $`r round(mean(subset(df$income,df$health_insured==2)),0)` This is far below the 99% confidence interval of the mean income of the households where individuals do have cover. We can therefore infer, with at least 99% confidence, that the mean income of such households _IS_ lower.
 
 If we suppose a null hypothesis, Ho, that the mean income of households where lack of health insurance is found is the same as that of households where everyone has health cover, against an alternative hypothesis HA that the income is lower, then the p-value for this is:
-
-Standard error of mean of non-health cover households
-
 ```{r p value}
 se<-sd(notInsured$income)/sqrt(nrow(notInsured))
 zScore<-(mean(insured$income)-mean(notInsured$income))/se
@@ -138,14 +129,13 @@ pnorm(zScore,lower.tail=FALSE)
 ```
 This is effectively zero and so we can reject the null hypothesis at any level of significance. This result is consistent with the confidence interval we found above.
 
-To assess whether the rise in proportion of households in which members have no health cover is in fact significant, we carry out a Chi-squared test in which the null hypothesis is that the proportion of households where this is the case is independent of income category, and equal to the pooled proportion for the whole sample, which is 
+Now we tuiren to our second question. To assess whether the rise in proportion of households in which members have no health cover is in fact significant, we carry out a chi-squared test in which the null hypothesis is that the proportion of households where this is the case is independent of income category, and equal to the pooled proportion for the whole sample, which is 
 ```{r}
 h0<-sum(df$health_insured==2)/nrow(df)
 h0
 ```
 
 The chi-squared test statistic and degrees of freedom are given by
-
 ```{r chi sq}
 Z<-sum((h0*sc-sc)^2/(h0*sc))
 Z
@@ -154,7 +144,6 @@ degF
 ```
 
 Hence the p-value for this test is:
-
 ```{r}
 pchisq(Z,degF,lower.tail=FALSE)
 ```
@@ -189,7 +178,7 @@ The adaptation consists largely of removal of missing values and the creation of
 
 ### Appendix:
 
-Here are the first 20 rows of the data used, showing the income category (1-27) of the household of the individual, whether or not (Yes:1, No:1) the individual had health insurance, and the middle value of the annual income of the income category, in US$.
+Here are the first 20 rows of the data used, showing the income category (1-27) of the household of the individual, whether or not (Yes:1, No:2) the individual had health insurance, and the middle value of the annual income of the income category, in US$.
 
 ```{r data}
 head(df,20)
