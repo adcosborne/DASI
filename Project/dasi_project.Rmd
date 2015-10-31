@@ -1,11 +1,14 @@
 ---
-title: "project title"
-date: "date"
+title: "Impact of household income on prevalence of health insurance in the US"
+date: "31/10/2015"
 output:
   html_document:
     theme: cerulean
 ---
 
+```{r}
+options("scipen"=10)
+```
 <!-- For more info on RMarkdown see http://rmarkdown.rstudio.com/ -->
 
 <!-- Enter the code required to load your data in the space below. The data will be loaded but the line of code won't show up in your write up (echo=FALSE) in order to save space-->
@@ -15,30 +18,179 @@ load(url("http://bit.ly/dasi_anes_data"))
 
 <!-- In the remainder of the document, add R code chunks as needed -->
 
+
 ### Introduction:
 
-Insert introduction here...
+Every country has the problem of how extensive a health care system should be, and how it should be funded. In the US, health care is at least in part funded by payment at the point of use through private health insurance taken out by the  adult individuals who require care. The extent of care that can be given is determined by the coverage of the insurance policy. A clear issue arises, in that those on low incomes can afford less cover, and might also be tempted, indeed forced by financial hardship, to forego cover altogether. This study uses data from the American Elections Time Series study to investigate whether family incomes in households where indivuduals do not have health insurance are in fact lower than those of houseeholds where the indivuals to have health cover.
+
+This study tackles this issue in two ways. First, it asks:
+
+__Is the mean income of US families within which individuals do not have health insurance lower than that of families where they do?__
+
+It then asks the more detailed question of whether the proportion of households that have members without health insurance is correlated with the income bracket of the household. 
 
 ### Data:
 
-Insert data section here...
+We use the American National Elections Time Series Study Coursera Extract  data set, as provided on the course website:
+ https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fanes1.html.
+This is an adaptation of the original data set which can be found at
+American National Election Studies (ANES; www.electionstudies.org).
+The adaptation consists largely of removal of missing values and the creation of factor variables where appropriate.
+
+Data were collected via the internet and via in-person (face-to-face interviews). Households for the latter were selected using an address-based, stratified, multi-stage cluster sample in 125 census tracts. Households for the former were selected using a combination of random selection of household by landline telephone number, and addressed based sampling, the latter method being introduced to account for the rising proportion of households, particularly among the young, that do not have a landline phone.
+
+In total, information on 5914 individuals has been collected in this way.
+
+In this data set the cases are the individuals that were contacted in this survey. They are all voters resident in the US. These could be split into subsets for each presidential election.
+
+The two variables to be studied are income of the household of the individual and whether or not the individual had health insurance.
+
+The first variable is logged as one of 28 categories, each of which has given  lower and upper bounds for income range. For the first of our questions we will take the midpoint of this range as representative of the income  for each category. Those who are in households where the income exceeds $250,000 (an unbounded category) will not be included in this analysis. For such high income households, there is little concern as to whether individuals in them have health insurance or not. If not, it is unlikely to be due to shortage of funds.
+
+
+```{r}
+df<-as.data.frame(cbind(as.numeric(anes$incgroup_prepost),anes$health_insured))
+names(df)=c("income_cat","health_insured")
+# remove NAs
+df<-subset(df,is.na(df$income_cat)==FALSE & is.na(df$health_insured)==FALSE)
+# remove those with incomes over $250000
+df<-subset(df,df$income !=28)
+```
+```{r}
+income=c(2500,7500,11250,13750,16250,18750,21250,23750,26250,28750,32500,37500,
+          42500,47500,52500,57500,62500,67500,72500,77500,85000,95000,105000,
+          117500,137500,162500,212500)
+
+for (i in 1:nrow(df)) {
+    df$income=income[df$income_cat]
+}
+```
+
+
+Hence this variable will be treated in the analysis of the first question as numeric in nature.
+
+The second variable is categorical in type, with categories "Yes" (I do have health insurance) and "No" ( I do not).
+
+To help answer the second of our questions, we find the proportion and number in each category that do not have health insurance in each of the 28 income categories.
+
+```{r proportions}
+s<-round(tapply(df$health_insured-1,df$income_cat,mean),3)
+s
+sc<-sapply(split(df,df$income_cat),nrow)
+sc
+```
+
+To account for inflation between elections, the household incomes could be normalised for each election by dividing by the mean and standard deviation of household incomes for whichever election the data were collected at. However we will not do this in this short study.
 
 ### Exploratory data analysis:
 
-Insert exploratory data analysis here...
+```{r EDA}
+summary(subset(df,health_insured==1))
+summary(subset(df,health_insured==2))
+insured<-subset(df,health_insured==1)
+notInsured<-subset(df,health_insured==2)
+```
+
+```{r}
+par(mfrow=c(1,2))
+boxplot(income~health_insured,
+        data=df,
+        names=c("Yes","No"),
+        xlab="Health insurance?",
+        ylab="Household income",
+        col=terrain.colors(3))
+# legend("topright", inset=.02, title="health Insurance",
+  	#c("Yes","No"), fill=terrain.colors(3), horiz=TRUE,cex=0.7)
+plot(s,
+     pch=19,
+     col="red",
+     # main="Proportion of households without health cover",
+     xlab="Income category of household",
+     ylab="Proportion without cover")
+
+```
+
+Figure 1: (left) Distribution of household income as a function of whether or not all indiviudals in the household have health insurance. (right) variation with income bracket of proportion of households without health insurance.
+
+The boxplots in Figure 1 suggest data that is right skewed, as is common for incomes, and that the median income, at least, for households with health insurance (labelled Box 1) is higher than that for households without it (labelled 2). The mean income for households where individuals have health insurance is `r round(mean(subset(df$income,df$health_insured==1)),0)` while that for incomes where this is not the case is `r round(mean(subset(df$income,df$health_insured==2)),0)` - just under half as big.
+
+A plot of the proportion of households in which people live that do not have health insurance against income category (1 is lowest income, 27 is highest income) is shown in Figure 1 (b):
+
+There is a clear downward trend here, but the apparent linearity of the trend is deceptive since income category is a categorical variable, with the highest categories having higher absolute  width in monetary value than the lower ones. Nevertheless, we see that about one third of low income households sampled had people without health cover, whereas this was the case in less than 5% of the high income households.
 
 ### Inference:
 
-Insert inference section here...
+When we calculate the 99% confidence interval around the mean income of households that do have health insurance, we find:
+```{r}
+ci99<-mean(insured$income)+c(-1,1)*qnorm(0.995)*sd(insured$income)/sqrt(nrow(insured))
+ci99
+```
+The mean income of households where individuals live that do not have health insurance is `r round(mean(subset(df$income,df$health_insured==2)),0)` This is far below the 99% confidence interval of the mean income of the households where individuals do have cover. We can therefore infer, with at least 99% confidence, that the mean income of such households _IS_ lower.
+
+If we suppose a null hypothesis, Ho, that the mean income of households where lack of health insurance is found is the same as that of households where everyone has health cover, against an alternative hypothesis HA that the income is lower, then the p-value for this is:
+
+Standard error of mean of non-health cover households
+
+```{r p value}
+se<-sd(notInsured$income)/sqrt(nrow(notInsured))
+zScore<-(mean(insured$income)-mean(notInsured$income))/se
+pnorm(zScore,lower.tail=FALSE)
+```
+This is effectively zero and so we can reject the null hypothesis at any level of significance. This result is consistent with the confidence interval we found above.
+
+To assess whether the rise in proportion of households in which members have no health cover is in fact significant, we carry out a Chi-squared test in which the null hypothesis is that the proportion of households where this is the case is independent of income category, and equal to the pooled proportion for the whole sample, which is 
+```{r}
+h0<-sum(df$health_insured==2)/nrow(df)
+h0
+```
+
+The chi-squared test statistic and degrees of freedom are given by
+
+```{r chi sq}
+Z<-sum((h0*sc-sc)^2/(h0*sc))
+Z
+degF <- length(unique(df$income_cat)) -1
+degF
+```
+
+Hence the p-value for this test is:
+
+```{r}
+pchisq(Z,degF,lower.tail=FALSE)
+```
+It is reasonable to use a chi-squared test here since there are many more than 5 observations in each income category, (the minimum number pper category is `r min(sc)` and we can reasonably assume independence between the counts in each category.
+
+This is an observational study. The population of American voters has been randomly sampled, but not been randomly assigned to any groups or subjected to differing treatments depending on that assignation.
+
+This study is of a large (>>30 subjects) sample that nevertheless forms a small proportion (<<10%) of the population from which it was drawn. These subjects were randomly selected. Hence the central limit theorem should apply even if the sub-sample (insured or not insured for health) income distributions are right skewed, as income distributions generally are. Hence we can generalise from the results of this sample to the population as a whole.
+
+Bias may occur in the selection of the sample, if this is not truly random. Significant efforts were made to avoid this, as explained in the code book, for example to not exclude those households that do not have a landline telephone.
+
+However, even if the sample is truly random, it is a sample of voters in the US. Therefore it may not be representative of non-voters in the US, and hence, is not not necessarily representative of all individuals actually present in the US.
+
+Since this study is observational, it cannot establish a causal relationship between household income and the likelihood of individuals in that household having health insurance. It can only establish correlation between these two, if any.
 
 ### Conclusion:
+From the analysis above we can conclude that there is indeed a correlation between household income and whether or not individuals in the household have health insurance. This is born out by the chi-squared test: a p-value close to zero means that we can confidently reject the null hypothesis that the proportion of households in which people live who have no health cover is independent of the income bracket of that household. 
 
-Insert conclusion here...
+There is no easy solution to finding a workable model for health care for all, but this analysis shows that a case can be made that, in the US, many low income households do not have the access to health care enjoyed by higher income households.
+
+This study has not sought to find out whether the results have changed with time. A further study could address this and separately analyse individuals surveyed at each of the several elections included in the data set.
+
 
 ### References:
 
-Insert references here...
+We use the American National Elections Time Series Study Coursera Extract  data set, as provided on the course website:
+ https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fanes1.html.
+This is an adaptation of the original data set which can be found at
+American National Election Studies (ANES; www.electionstudies.org).
+The adaptation consists largely of removal of missing values and the creation of factor variables where appropriate.
+
 
 ### Appendix:
 
-Insert appendix here...
+Here are the first 20 rows of the data used, showing the income category (1-27) of the household of the individual, whether or not (Yes:1, No:1) the individual had health insurance, and the middle value of the annual income of the income category, in US$.
+
+```{r data}
+head(df,20)
+```
