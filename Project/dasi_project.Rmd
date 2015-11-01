@@ -24,7 +24,7 @@ load(url("http://bit.ly/dasi_anes_data"))
 
 ### Introduction:
 
-Every country has the problem of how extensive a health care system should be, and how it should be funded. In the US, health care is at least in part funded by payment at the point of use through private health insurance taken out by the  adult individuals who require care. The extent of care that can be given is determined by the coverage of the insurance policy. A clear issue arises, in that those on low incomes can afford less cover, and might also be tempted, indeed forced by financial hardship, to forego cover altogether. This study uses data from the American Elections Time Series study to investigate whether family incomes in households where indivuduals do not have health insurance are in fact lower than those of houseeholds where the indivuals to have health cover.
+Every country has the problem of how extensive a health care system should be, and how it should be funded. In the US, health care is at least in part funded by payment at the point of use through private health insurance taken out by the  adult individuals who require care. The extent of care that can be given is determined by the coverage of the insurance policy. A clear issue arises, in that those on low incomes can afford less cover, and might also be tempted, indeed forced by financial hardship, to forego cover altogether. This study uses data from the American Elections Time Series study to investigate whether family incomes in households where individuals do not have health insurance are in fact lower than those of households where the individuals to have health cover.
 
 This study tackles this issue in two ways. First, it asks:
 
@@ -34,10 +34,9 @@ It then asks the more detailed question of whether the proportion of households 
 
 ### Data:
 
-We use the American National Elections Time Series Study Coursera Extract  data set, as provided on the course website:
- https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fanes1.html.
+We use the American National Elections Time Series Study Coursera Extract  data set, as provided on the [DASI course website:](https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fanes1.html).
 This is an adaptation of the original data set which can be found at
-American National Election Studies (ANES; www.electionstudies.org).
+American National Election Studies [ANES](www.electionstudies.org).
 The adaptation consists largely of removal of missing values and the creation of factor variables where appropriate.
 
 Data were collected via the internet and via in-person (face-to-face interviews). Households for the latter were selected using an address-based, stratified, multi-stage cluster sample in 125 census tracts. Households for the former were selected using a combination of random selection of household by landline telephone number, and addressed based sampling, the latter method being introduced to account for the rising proportion of households, particularly among the young, that do not have a landline phone.
@@ -106,7 +105,8 @@ plot(s,
      ylab="Proportion without cover")
 
 ```
-Figure 1: (left) Distribution of household income as a function of whether or not all indiviudals in the household have health insurance. (right) variation with income bracket of proportion of households without health insurance.
+
+Figure 1: (left) Distribution of household income as a function of whether or not all indiviudals in the household have health insurance. (right) Variation with income bracket of proportion of households without health insurance.
 
 The boxplots in Figure 1 suggest data that is right skewed, as is common for incomes, and that the median income, at least, for households with health insurance is higher than that for households without it. The mean income for households where individuals have health insurance is $`r round(mean(subset(df$income,df$health_insured==1)),0)` while that for incomes where this is not the case is $`r round(mean(subset(df$income,df$health_insured==2)),0)` - just under half as big.
 
@@ -130,9 +130,9 @@ se<-sd(notInsured$income)/sqrt(nrow(notInsured))
 zScore<-(mean(insured$income)-mean(notInsured$income))/se
 pnorm(zScore,lower.tail=FALSE)
 ```
-This is effectively zero and so we can reject the null hypothesis at any level of significance. This result is consistent with the confidence interval we found above.
+This is effectively zero and so we can reject the null hypothesis at any reasonable level of significance. This result is consistent with the confidence interval we found above.
 
-Now we tuiren to our second question. To assess whether the rise in proportion of households in which members have no health cover is in fact significant, we carry out a chi-squared test in which the null hypothesis is that the proportion of households where this is the case is independent of income category, and equal to the pooled proportion for the whole sample, which is 
+Now we turn to our second question. To assess whether the observed rise in proportion of households in which members have no health cover is in fact significant and not due to chance, we carry out a chi-squared test in which the null hypothesis is that the proportion of households where this is the case is independent of income category, and equal to the pooled proportion for the whole sample, which is 
 ```{r}
 h0<-sum(df$health_insured==2)/nrow(df)
 h0
@@ -150,7 +150,7 @@ Hence the p-value for this test is:
 ```{r}
 pchisq(Z,degF,lower.tail=FALSE)
 ```
-It is reasonable to use a chi-squared test here since there are many more than 5 observations in each income category, (the minimum number pper category is `r min(sc)` and we can reasonably assume independence between the counts in each category.
+It is reasonable to use a chi-squared test here since there are many more than 5 observations in each income category, (the minimum number per category is `r min(sc)` and we can reasonably assume independence between the counts in each category.
 
 This is an observational study. The population of American voters has been randomly sampled, but not been randomly assigned to any groups or subjected to differing treatments depending on that assignation.
 
@@ -172,10 +172,9 @@ This study has not sought to find out whether the results have changed with time
 
 ### References:
 
-We use the American National Elections Time Series Study Coursera Extract  data set, as provided on the course website:
- https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fanes1.html.
+We use the American National Elections Time Series Study Coursera Extract  data set, as provided on the [DASI course website:](https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fanes1.html).
 This is an adaptation of the original data set which can be found at
-American National Election Studies (ANES; www.electionstudies.org).
+American National Election Studies [ANES](www.electionstudies.org).
 The adaptation consists largely of removal of missing values and the creation of factor variables where appropriate.
 
 
