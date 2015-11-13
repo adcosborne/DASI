@@ -1,0 +1,80 @@
+---
+title: "OpenIntro"
+author: "mbh038"
+date: "November 13, 2015"
+output:
+  html_document:
+    theme: cerulean
+---
+
+# Inference for numerical data
+
+## 5.1 One-sample means with the _t_-distribution
+
+### 5.1.1 The normality condition
+
+#### Central Limit Theorem for normal data
+The sampling distribution of the mean is nearly normal when the sample obser-
+vations are independent and come from a nearly normal distribution. This is true
+for any sample size.
+
+#### Caution: Checking the normality condition
+We should exercise caution when verifying the normality condition for small sam-
+ples. It is important to not only examine the data but also think about where
+the data come from. For example, ask: would I expect this distribution to be
+symmetric, and am I condent that outliers are rare?
+
+#### Degrees of freedom (df)
+The degrees of freedom describe the shape of the t-distribution. The larger the
+degrees of freedom, the more closely the distribution approximates the normal
+model.
+
+### 5.1.3 Conditions for using the t-distribution for inference on a sample mean
+__Independence of observations__. We verify this condition just as we did before. We collect a simple random sample from less than 10% of the population,
+
+__Observations come from a nearly normal distribution.__
+
+#### TIP: When to use the _t_-distribution
+Use the t-distribution for inference of the sample mean when observations are in-dependent and nearly normal. You may relax the nearly normal condition as the
+sample size increases. For example, the data distribution may be moderately skewed when the sample size is at least 30.
+
+### 5.1.4 One sample _t_-confidence intervals
+$$\bar{x} \ \pm\  t^{\star}_{df}SE$$
+
+#### Degrees of freedom for a single sample
+If the sample has $n$ observations and we are examining a single mean, then we use the t-distribution with $df = n - 1$ degrees of freedom.
+
+#### Finding a _t_-confidence interval for the mean
+Based on a sample of n independent and nearly normal observations, a confidence
+interval for the population mean is
+$$\bar{x} \ \pm\  t^{\star}_{df}SE$$
+
+where $\bar{x}$ is the sample mean, $t^{\star}_{df}$ corresponds to the confidence level and degrees of freedom, and $SE$ is the standard error as estimated by the sample.
+
+### 5.1.5 One sample t-tests
+#### When using a _t_-distribution, we use a __T__-score (same as __Z__-score)
+To help us remember to use the t-distribution, we use a __T__ to represent the test statistic, and we often call this a __T__-score. The __Z__-score and __T__-score are computed in the exact same way and are conceptually identical: each represents how many standard errors the observed value is from the null value.
+
+## 5.2 Paired Data
+
+### 5.2.1 Paired observations
+
+#### Paired data
+Two sets of observations are paired if each observation in one set has a special
+correspondence or connection with exactly one observation in the other data set.
+
+### 5.2.2 Inference for paired data
+To analyze a paired data set, we simply analyze the differences.
+
+## 5.3 Difference of two means
+### 5.3.1 Confidence interval for a difference of means
+#### Using the _t_-distribution for a difference in means
+The _t_-distribution can be used for inference when working with the standardized difference of two means if (1) each sample meets the conditions for using the _t_-distribution and (2) the samples are independent.
+
+#### Distribution of a difference of sample means
+The sample difference of two means, $\bar{x}_1 - \bar{x}_2$, can be modeled using the $t$-distribution and the standard error
+$$SE_{\bar{x}_{1} - \bar{x}_{2}} = \sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}
+\label{seOfDifferenceInMeans}$$
+when each sample mean can itself be modeled using a $t$-distribution and the samples are independent. To calculate the degrees of freedom, use statistical software or the smaller of $n_1 - 1$ and $n_2 - 1$.
+
+###5.3.2 Hypothesis tests based on a difference in means
